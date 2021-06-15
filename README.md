@@ -30,30 +30,10 @@ El código que acompaña a este enunciado tiene una estructura básica del juego
 
 Se agregan algunos visuals, una tecla en el nivel 1 para simular que se terminó, y una tecla en el nivel 2 para simular que se ganó. Estas cosas son para probar: los visuals deben reemplazarse por los que implementen ustedes; con las teclas como prefieran, déjenlas como están, cambien de tecla, o bórrenlas.
 
-
-## Bonuses
-En el nivel 2, mostrar la energía restante en la parte de arriba del tablero.
-
-Lograr que cajas, llaves y comida aparezcan en lugares aleatorios.
-
-En el nivel 2, arrancar con una sola comida, y que cada vez que el personaje obtiene una comida que aparezca otra.
-
-En el nivel 2, que algunas llaves estén dentro de un cofre. Los cofres se abren de una patada, desde una posición adyacente. La patada que sea con una tecla. Cada patada le hace consumir al personaje 6 unidades de energía.
-
-## Mega bonus
-Agregar un nivel 3, en el que hay bichos que se mueven automáticamente. El objetivo es matar todos los bichos, lanzándoles granadas. La granada recorre hasta 3 celdas en la dirección del último movimiento del personaje. Si un bicho se choca con el personaje, entonces le resta 20 unidades de salud, y vuelve a su posición anterior.  
-Atenti: el personaje nace sin granadas, tiene que recogerlas del tablero. 
-
 Se pueden hacer bichos con movimientos aleatorios, pero también que se muevan hacia el personaje.
 Se pueden agregar items (como los pollos) que dan energía, y otros que dan salud (ponele, un botiquín).
 Y ya da para poner indicadores de energía, salud y cantidad de granadas del personaje.
 
-
-
-# Agregados para entregas individuales
-
-A continuación, describimos extensiones al juego, que pueden ser resueltas en forma individual.
-Todas estas extensiones aplican al nivel 2, el de buscar llaves.
 
 ## Modificadores del efecto energético de los pollos
 Agregar al tablero elementos que modifiquen el efecto que tiene en la energía encontrarse con un pollo. Cada uno de estos elementos tiene un criterio particular para calcular cuánta energía adquiere el personaje al consumir un pollo. Implementar, al menos, las siguientes opciones:
@@ -78,12 +58,15 @@ Estos elementos tienen en común que aplican cuando el personaje _pasa al lado_.
 
 Idealmente, cada uno de estos elementos tiene efecto solamente la primera vez que el personaje pasa por al lado. Pero sigue estando en el tablero e impidiendo el paso. Contemplar _dos imágenes_, una de celda sorpresa "activa" y otro de celda sorpresa que ya ha sido usada.
 
-## Dos personajes
-Agregar un segundo personaje al nivel 2. Los personajes mueven alternativamente, una vez cada uno. Los dos pueden recoger llaves y ganar energía con los pollos.  
-El que pasa por la puerta con todas las llaves recogidas gana, no importa quién haya recogido qué llave. En tal caso, indicar quién ganó.  
-Si uno de los personajes se queda sin energía, lo mejor sería que quedara jugando solamente el otro. Si esto no sale, que se dé el juego por perdido.
+## Bonus simple
+En el nivel 2, mostrar la energía restante en la parte de arriba del tablero.
 
-Contemplar, para cada personaje, dos imágenes, una cuando está activo (o sea, es el que se va a mover con la próxima flecha), uno cuando no.
+Lograr que cajas, llaves y comida aparezcan en lugares aleatorios.
 
+En el nivel 2, arrancar con una sola comida, y que cada vez que el personaje obtiene una comida que aparezca otra.
 
+En el nivel 2, que algunas llaves estén dentro de un cofre. Los cofres se abren de una patada, desde una posición adyacente. La patada que sea con una tecla. Cada patada le hace consumir al personaje 6 unidades de energía.
 
+## Mega bonus
+Agregar un nivel 3, en el que hay bichos que se mueven automáticamente. El objetivo es matar todos los bichos, lanzándoles granadas. La granada recorre hasta 3 celdas en la dirección del último movimiento del personaje. Si un bicho se choca con el personaje, entonces le resta 20 unidades de salud, y vuelve a su posición anterior.  
+Atenti: el personaje nace sin granadas, tiene que recogerlas del tablero. 

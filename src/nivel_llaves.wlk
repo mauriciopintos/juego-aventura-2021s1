@@ -1,6 +1,7 @@
 import wollok.game.*
 import fondo.*
 import personajes.*
+import utilidades.*
 
 object nivelLlaves {
 

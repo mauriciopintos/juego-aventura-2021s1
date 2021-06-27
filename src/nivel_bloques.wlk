@@ -3,16 +3,33 @@ import fondo.*
 import personajes.*
 import elementos.*
 import nivel_llaves.*
+import utilidades.*
 
 
 object nivelBloques {
-
+	const property bloquesEnTablero = []
+	
+	method ponerBloques(cantidad) {
+		if(cantidad > 0) {
+			const unBloque = new Bloque(position=utilidadesParaJuego.posicionArbitraria())
+			self.bloquesEnTablero().add(unBloque)
+			game.addVisual(unBloque)
+			self.ponerBloques(cantidad -1)
+		}
+	}
+	
 	method configurate() {
 		// fondo - es importante que sea el primer visual que se agregue
-		game.addVisual(new Fondo(image="fondoCompleto.png"))
-				 
+		game.addVisual(new Fondo())
+		
+		// Se agrega la salida al tablero
+		game.addVisual(salida)
+		
+		// Define zona de deposito
+		deposito.defineZona()
+		
 		// otros visuals, p.ej. bloques o llaves
-		game.addVisual(new Bloque(position=game.at(3,12)))
+		self.ponerBloques(5)
 			
 		// personaje, es importante que sea el último visual que se agregue
 		game.addVisual(personajeSimple)

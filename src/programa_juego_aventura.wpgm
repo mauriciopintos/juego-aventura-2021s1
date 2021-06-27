@@ -1,5 +1,6 @@
 import wollok.game.*
 import nivel_bloques.*
+import utilidades.*
 
 program juego_aventura {
 

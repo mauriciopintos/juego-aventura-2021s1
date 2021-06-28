@@ -7,7 +7,7 @@ import nivel_bloques.*
 // imagen y posición
 
 object personajeSimple {
-	var property position = utilidadesParaJuego.posicionArbitraria() //game.at(10,8)
+	var property position = utilidadesParaJuego.posicionArbitraria()
 	const property posicionesVisitadas = #{}
 	const property image = "player.png"
 	var property energia=0
@@ -17,17 +17,22 @@ object personajeSimple {
 		return true
 	}
 	
+	method siHayBloqueEmpujar(posicion) {
+		if (nivelBloques.hayBloque(posicion) and not nivelBloques.hayBloque(proximaPosicion) ){
+			const unBloque = nivelBloques.bloquesEnTablero().find( { b => b.position() == posicion } )
+			unBloque.empujar(proximaPosicion)
+		}
+	}
+	method avanzarA(posicion) {
+		self.siHayBloqueEmpujar(posicion)
+		if(not nivelBloques.hayBloque(posicion)) {
+			self.position(posicion)
+			posicionesVisitadas.add(posicion)
+		}
+	}
 	method cambiarPosicion(posicion) {
 		if (utilidadesParaJuego.sePuedeMover(posicion) ) {
-			if (nivelBloques.hayBloque(posicion) and not nivelBloques.hayBloque(proximaPosicion) ){
-				const unBloque = nivelBloques.bloquesEnTablero().find( { b => b.position() == posicion } )
-				unBloque.empujar(proximaPosicion)
-				self.position(posicion)
-				posicionesVisitadas.add(posicion)
-			}else if(not nivelBloques.hayBloque(posicion)) {
-				self.position(posicion)
-				posicionesVisitadas.add(posicion)
-			}
+			self.avanzarA(posicion)
 		}
 	}
 	

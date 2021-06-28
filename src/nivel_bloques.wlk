@@ -9,6 +9,15 @@ import utilidades.*
 object nivelBloques {
 	const property bloquesEnTablero = []
 	
+	method todosLosBloquesEnDeposito() = self.bloquesEnTablero().all( { b => b.estaEnDeposito() } )
+	
+	method faltanRequisitos() {
+		if (self.todosLosBloquesEnDeposito())
+			game.say(personajeSimple,"Debo ir a la salida")
+		else
+			game.say(personajeSimple,"Faltan bloques en el deposito")
+	}
+	
 	method hayBloque(posicion) = self.bloquesEnTablero().any( { b => b.position() == posicion } )
 	
 	method ponerBloques(cantidad) {
@@ -26,10 +35,7 @@ object nivelBloques {
 		
 		// Se agrega la salida al tablero
 		game.addVisual(salida)
-		
-		// Define zona de deposito
-		deposito.defineZona()
-		
+						
 		// otros visuals, p.ej. bloques o llaves
 		self.ponerBloques(5)
 			
@@ -37,10 +43,19 @@ object nivelBloques {
 		game.addVisual(personajeSimple)
 		
 		// teclado
-		// este es para probar, no es necesario dejarlo
-		keyboard.t().onPressDo({ self.terminar() })
-
-		// en este no hacen falta colisiones
+		
+		/*Movimientos del personaje*/
+		keyboard.right().onPressDo{ personajeSimple.moverDerecha() }
+		keyboard.left().onPressDo{ personajeSimple.moverIzquierda() } 
+		keyboard.up().onPressDo{ personajeSimple.moverArriba() }
+		keyboard.down().onPressDo{ personajeSimple.moverAbajo() }
+		keyboard.n().onPressDo({
+			if(self.todosLosBloquesEnDeposito() and personajeSimple.position() == salida.position() )
+				self.terminar()
+			else
+				self.faltanRequisitos()
+		})
+					
 	}
 	
 	method terminar() {

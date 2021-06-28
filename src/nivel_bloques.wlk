@@ -9,6 +9,8 @@ import utilidades.*
 object nivelBloques {
 	const property bloquesEnTablero = []
 	
+	method hayBloque(posicion) = self.bloquesEnTablero().any( { b => b.position() == posicion } )
+	
 	method ponerBloques(cantidad) {
 		if(cantidad > 0) {
 			const unBloque = new Bloque(position=utilidadesParaJuego.posicionArbitraria())

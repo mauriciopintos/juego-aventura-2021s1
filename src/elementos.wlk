@@ -1,5 +1,6 @@
 import wollok.game.*
 import utilidades.*
+import nivel_bloques.*
 
 class Bloque {	// Cajas
 	var property position
@@ -7,10 +8,17 @@ class Bloque {	// Cajas
 	
 	// agregar comportamiento
 	method estaEnDeposito() = deposito.celdas().contains(self.position())
+	
+	method empujar(posicion) {
+		if (utilidadesParaJuego.sePuedeMover(posicion) and not nivelBloques.hayBloque(posicion)){
+			self.position(posicion)
+			//posicionesVisitadas.add(posicion)
+		}
+	}
 }
 
 object deposito {
-	var property celdas = [] // Definir el rango de celdas game.at(5,7)..game.at(9,12)
+	var property celdas = #{} // Definir el rango de celdas game.at(5,7)..game.at(9,12)
 	const property xi = 5
 	const property yi = 7
 	const property xf = 9

@@ -1,15 +1,27 @@
 import wollok.game.*
 import nivel_bloques.*
-import utilidades.*
+import personajes.*
 
 program juego_aventura {
-
+	
+	
 	game.title("Oh qué aventura")
 	game.height(15)
 	game.width(15)
 	game.boardGround("fondoBlanco.png")
 
 	nivelBloques.configurate()	
+	/*Agregado de la instancia al juego*/
+	
+	
+	/*Movimientos del personaje*/
+	keyboard.right().onPressDo{ personajeSimple.moverDerecha() }
+	keyboard.left().onPressDo{ personajeSimple.moverIzquierda() } 
+	keyboard.up().onPressDo{ personajeSimple.moverArriba() }
+	keyboard.down().onPressDo{ personajeSimple.moverAbajo() }
+	
+	
+	
 	
 	game.start()
 }

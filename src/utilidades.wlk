@@ -3,7 +3,7 @@ import wollok.game.*
 object utilidadesParaJuego {
 	method posicionArbitraria() {
 		return game.at(
-			0.randomUpTo(game.width()).truncate(0), 0.randomUpTo(game.height()).truncate(0)
+			1.randomUpTo(game.width()-1).truncate(0), 1.randomUpTo(game.height()-1).truncate(0)
 		)
 	}
 	
@@ -20,6 +20,10 @@ object utilidadesParaJuego {
 			objeto.celdas().add(game.at(objeto.x(),objeto.y()))
 			self.defineRangoDeCeldas(objeto)
 		}
+	}
+	
+	method sePuedeMover(posicion) {
+		return posicion.x().between(0,game.width()-1) and posicion.y().between(0,game.height()-1)	
 	}
 	
 	/* DESARROLLAR IDEA

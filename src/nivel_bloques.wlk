@@ -7,7 +7,7 @@ import utilidades.*
 
 
 object nivelBloques {
-	const property bloquesEnTablero = []
+	const property bloquesEnTablero = #{}
 	
 	method todosLosBloquesEnDeposito() = self.bloquesEnTablero().all( { b => b.estaEnDeposito() } )
 	
@@ -22,7 +22,7 @@ object nivelBloques {
 	
 	method ponerBloques(cantidad) {
 		if(cantidad > 0) {
-			const unBloque = new Bloque(position=utilidadesParaJuego.posicionArbitraria())
+			const unBloque = new Bloque()
 			self.bloquesEnTablero().add(unBloque)
 			game.addVisual(unBloque)
 			self.ponerBloques(cantidad -1)
@@ -38,7 +38,8 @@ object nivelBloques {
 						
 		// otros visuals, p.ej. bloques o llaves
 		self.ponerBloques(5)
-			
+	
+		
 		// personaje, es importante que sea el último visual que se agregue
 		game.addVisual(personajeSimple)
 		

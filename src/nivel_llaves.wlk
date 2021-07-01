@@ -5,6 +5,7 @@ import utilidades.*
 import elementos.*
 
 object nivelLlaves {
+	const property personajeNivelDos = new PersonajeNivelLlaves()
 	const property llavesEnTablero = #{}
 
 	method todasLasLlavesConseguidas() = self.llavesEnTablero().isEmpty()
@@ -21,11 +22,15 @@ object nivelLlaves {
 	method ponerLlaves(cantidad) {
 		if(cantidad > 0) {
 			const unaLlave = new Llave()
-			self.llavesEnTablero().add(unaLlave)
-			game.addVisual(unaLlave)
-			self.ponerLlaves(cantidad -1)
+			if (not self.hayLlave(unaLlave.position()) ) {
+				self.llavesEnTablero().add(unaLlave)
+				game.addVisual(unaLlave)
+				self.ponerLlaves(cantidad -1)
+			}else{
+				self.ponerLlaves(cantidad)	
+			}
 		}
-	}			
+	}
 
 	method configurate() {
 		// fondo - es importante que sea el primer visual que se agregue
@@ -37,26 +42,21 @@ object nivelLlaves {
 		// personaje, es importante que sea el último visual que se agregue
 		game.addVisual(personajeNivelDos)
 		
+		//game.schedule(2000,game.say(pizarra,"Energia: "+ personajeNivelDos.energia()))
+		
 		// teclado
 		keyboard.right().onPressDo{ personajeNivelDos.moverDerecha() }
 		keyboard.left().onPressDo{ personajeNivelDos.moverIzquierda() } 
 		keyboard.up().onPressDo{ personajeNivelDos.moverArriba() }
 		keyboard.down().onPressDo{ personajeNivelDos.moverAbajo() }
-		keyboard.n().onPressDo({
-			if(self.todasLasLlavesConseguidas())
-				// Se agrega la salida al tablero
-				game.addVisual(salida)
-				if( personajeNivelDos.position() == salida.position())
-					self.ganar()
-			else
-				self.faltanRequisitos()
-		})
+
 		
 		// este es para probar, no es necesario dejarlo
 		keyboard.g().onPressDo({ self.ganar() })
 		keyboard.p().onPressDo({ self.perder() })
 		
 		// colisiones, acá sí hacen falta
+		game.whenCollideDo(personajeNivelDos, { llave => self.recolectar(llave) } )
 	}
 	
 	method ganar() {

@@ -7,6 +7,7 @@ import utilidades.*
 
 
 object nivelBloques {
+	const property personajeSimple= new PersonajeNivelBloques()
 	const property bloquesEnTablero = #{}
 	
 	method todosLosBloquesEnDeposito() = self.bloquesEnTablero().all( { b => b.estaEnDeposito() } )

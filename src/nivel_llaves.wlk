@@ -5,58 +5,56 @@ import utilidades.*
 import elementos.*
 
 object nivelLlaves {
-	const property personajeNivelDos = new PersonajeNivelLlaves()
-	const property llavesEnTablero = #{}
-
-	method todasLasLlavesConseguidas() = self.llavesEnTablero().isEmpty()
-	method recolectar(unaLlave){
-		self.llavesEnTablero().remove(unaLlave)
-		game.removeVisual(unaLlave)
-		if (self.todasLasLlavesConseguidas()){
-			// Se agrega la salida al tablero
-			game.addVisual(salida)
-		}
-	}
-	method hayLlave(posicion) = self.llavesEnTablero().any( { b => b.position() == posicion } )
+	const property personaje = new PersonajeNivelLlaves()
+	const elementosEnNivel = []
 	
-	method ponerLlaves(cantidad) {
+									// EL NOMBRE DEL ELEMENTO ES UN OBJETO QUE GENERA UNA NUEVA INSTANCIA CON EL METODO instanciar()
+	method ponerElementos(cantidad,elemento) { 	// debe recibir cantidad y EL NOMBRE DE UN ELEMENTO
 		if(cantidad > 0) {
-			const unaLlave = new Llave()
-			if (not self.hayLlave(unaLlave.position()) ) {
-				self.llavesEnTablero().add(unaLlave)
-				game.addVisual(unaLlave)
-				self.ponerLlaves(cantidad -1)
+			const unaPosicion = utilidadesParaJuego.posicionArbitraria()
+			if (not self.hayElementoEn(unaPosicion) ) {	//si la posicion no eta ocupada
+				const unaInstancia = elemento.instanciar(unaPosicion) // instancia el elemento en una posicion
+				elementosEnNivel.add(unaInstancia)	//Agrega el elemento a la lista
+				game.addVisual(unaInstancia) //Agrega el elemento al tablero
+				self.ponerElementos(cantidad -1,elemento) //llamada recursiva al proximo elemento a agregar
 			}else{
-				self.ponerLlaves(cantidad)	
+				self.ponerElementos(cantidad,elemento)	
 			}
 		}
 	}
-
+	 
+	/* Metodos que tambien interactuan con los movimientos del personaje */
+	method ponerSalida(){ game.addVisual(salida) }// Se agrega la salida al tablero
+	method elementoDe(posicion) = elementosEnNivel.find( { e => e.position() == posicion } )
+	method hayElementoEn(posicion) = elementosEnNivel.any( { e => e.position() == posicion } )
+	method estado() { game.say(personaje,personaje.nivelDeEnergia() ) } // indica el estado de energia
+	
 	method configurate() {
 		// fondo - es importante que sea el primer visual que se agregue
 		game.addVisual(new Fondo(image="fondoCompleto.png"))
 				 
 		// otros visuals, p.ej. bloques o llaves
-		self.ponerLlaves(3)
+		self.ponerElementos(3,llave)
+		self.ponerElementos(5,pollo)
+		self.ponerElementos(4,sorpresa)  // SOLO PARA PROBAR AGREGAR LOS QUE CORRESPONDA
 			
 		// personaje, es importante que sea el último visual que se agregue
-		game.addVisual(personajeNivelDos)
-		
-		//game.schedule(2000,game.say(pizarra,"Energia: "+ personajeNivelDos.energia()))
+		game.addVisual(personaje)
 		
 		// teclado
-		keyboard.right().onPressDo{ personajeNivelDos.moverDerecha() }
-		keyboard.left().onPressDo{ personajeNivelDos.moverIzquierda() } 
-		keyboard.up().onPressDo{ personajeNivelDos.moverArriba() }
-		keyboard.down().onPressDo{ personajeNivelDos.moverAbajo() }
-
+		keyboard.right().onPressDo{ personaje.moverDerecha() }
+		keyboard.left().onPressDo{ personaje.moverIzquierda() } 
+		keyboard.up().onPressDo{ personaje.moverArriba() }
+		keyboard.down().onPressDo{ personaje.moverAbajo() }
 		
-		// este es para probar, no es necesario dejarlo
-		keyboard.g().onPressDo({ self.ganar() })
-		keyboard.p().onPressDo({ self.perder() })
+		keyboard.e().onPressDo{ self.estado() }
 		
 		// colisiones, acá sí hacen falta
-		game.whenCollideDo(personajeNivelDos, { llave => self.recolectar(llave) } )
+		game.whenCollideDo(personaje, {
+			//objeto => objeto.reaccionarA(personaje)
+			objeto => game.removeVisual(objeto)
+			self.estado()
+		} )
 	}
 	
 	method ganar() {
@@ -97,5 +95,4 @@ object nivelLlaves {
 			})
 		})
 	}
-	
 }

@@ -7,16 +7,16 @@ import utilidades.*
 
 
 object nivelBloques {
-	const property personajeSimple= new PersonajeNivelBloques()
+	const property personaje= new PersonajeNivelBloques()
 	const property bloquesEnTablero = #{}
 	
 	method todosLosBloquesEnDeposito() = self.bloquesEnTablero().all( { b => b.estaEnDeposito() } )
 	
 	method faltanRequisitos() {
 		if (self.todosLosBloquesEnDeposito())
-			game.say(personajeSimple,"Debo ir a la salida")
+			game.say(personaje,"Debo ir a la salida")
 		else
-			game.say(personajeSimple,"Faltan bloques en el deposito")
+			game.say(personaje,"Faltan bloques en el deposito")
 	}
 	
 	method hayBloque(posicion) = self.bloquesEnTablero().any( { b => b.position() == posicion } )
@@ -39,20 +39,19 @@ object nivelBloques {
 						
 		// otros visuals, p.ej. bloques o llaves
 		self.ponerBloques(5)
-	
-		
+
 		// personaje, es importante que sea el último visual que se agregue
-		game.addVisual(personajeSimple)
+		game.addVisual(personaje)
 		
 		// teclado
 		
 		/*Movimientos del personaje*/
-		keyboard.right().onPressDo{ personajeSimple.moverDerecha() }
-		keyboard.left().onPressDo{ personajeSimple.moverIzquierda() } 
-		keyboard.up().onPressDo{ personajeSimple.moverArriba() }
-		keyboard.down().onPressDo{ personajeSimple.moverAbajo() }
+		keyboard.right().onPressDo{ personaje.moverDerecha() }
+		keyboard.left().onPressDo{ personaje.moverIzquierda() } 
+		keyboard.up().onPressDo{ personaje.moverArriba() }
+		keyboard.down().onPressDo{ personaje.moverAbajo() }
 		keyboard.n().onPressDo({
-			if(self.todosLosBloquesEnDeposito() and personajeSimple.position() == salida.position() )
+			if(self.todosLosBloquesEnDeposito() and personaje.position() == salida.position() )
 				self.terminar()
 			else
 				self.faltanRequisitos()
@@ -65,7 +64,7 @@ object nivelBloques {
 		game.clear()
 		// después puedo volver a agregar el fondo, y algún visual para que no quede tan pelado
 		game.addVisual(new Fondo(image="fondoCompleto.png"))
-		game.addVisual(personajeSimple)
+		game.addVisual(personaje)
 		// después de un ratito ...
 		game.schedule(2500, {
 			game.clear()
@@ -82,4 +81,3 @@ object nivelBloques {
 	}
 		
 }
-

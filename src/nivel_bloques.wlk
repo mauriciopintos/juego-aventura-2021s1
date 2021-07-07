@@ -20,13 +20,17 @@ object nivelBloques {
 	}
 	
 	method hayBloque(posicion) = self.bloquesEnTablero().any( { b => b.position() == posicion } )
-	
-	method ponerBloques(cantidad) {
+	method ponerBloques(cantidad) { 	// debe recibir cantidad y EL NOMBRE DE UN ELEMENTO
 		if(cantidad > 0) {
-			const unBloque = new Bloque()
-			self.bloquesEnTablero().add(unBloque)
-			game.addVisual(unBloque)
-			self.ponerBloques(cantidad -1)
+			const unaPosicion = utilidadesParaJuego.posicionArbitraria()
+			if (not self.hayBloque(unaPosicion) ) {	//si la posicion no eta ocupada
+				const unBloque = new Bloque(position=unaPosicion) // instancia el bloque en una posicion
+				bloquesEnTablero.add(unBloque)	//Agrega el bloque a la lista
+				game.addVisual(unBloque) //Agrega el bloque al tablero
+				self.ponerBloques(cantidad -1) //llamada recursiva al proximo bloque a agregar
+			}else{
+				self.ponerBloques(cantidad)	
+			}
 		}
 	}
 	
@@ -50,7 +54,7 @@ object nivelBloques {
 		keyboard.left().onPressDo{ personaje.moverIzquierda() } 
 		keyboard.up().onPressDo{ personaje.moverArriba() }
 		keyboard.down().onPressDo{ personaje.moverAbajo() }
-		keyboard.n().onPressDo({
+		keyboard.n().onPressDo({ // al presionar "n" finaliza el juego o da indicaciones
 			if(self.todosLosBloquesEnDeposito() and personaje.position() == salida.position() )
 				self.terminar()
 			else
@@ -60,18 +64,20 @@ object nivelBloques {
 	}
 	
 	method terminar() {
+		//sonido pasar
+		game.sound("pasar.mp3").play()		
 		// game.clear() limpia visuals, teclado, colisiones y acciones
 		game.clear()
 		// después puedo volver a agregar el fondo, y algún visual para que no quede tan pelado
 		game.addVisual(new Fondo(image="fondoCompleto.png"))
 		game.addVisual(personaje)
 		// después de un ratito ...
-		game.schedule(2500, {
+		game.schedule(1000, {
 			game.clear()
 			// cambio de fondo
 			game.addVisual(new Fondo(image="finNivel1.png"))
 			// después de un ratito ...
-			game.schedule(3000, {
+			game.schedule(1500, {
 				// ... limpio todo de nuevo
 				game.clear()
 				// y arranco el siguiente nivel

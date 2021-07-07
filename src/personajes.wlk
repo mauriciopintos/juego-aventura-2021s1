@@ -36,7 +36,6 @@ class Personaje {
 	method moverA_Haciendo(posicion) {
 		if (utilidadesParaJuego.sePuedeMover(posicion) ) { //Si hay celdas en la posicion de destino habilita el movimiento
 			self.hacerSiHayObjetoEn(posicion)
-			//self.moverA(posicion)
 		}
 	}
 	method hacerSiHayObjetoEn(posicion)		// Metodo abstracto que, si hay un objeto en la posicion destino, realiza las acciones que correspondan
@@ -47,12 +46,22 @@ class Personaje {
 class PersonajeNivelLlaves inherits Personaje {
 	var property energia=40
 	var property llavesConseguidas = 0
-	//var efectoModificador = null
+	var efectoModificador =  {unPollo,energiaActual => unPollo.energia() }
 	
-	method nivelDeEnergia() = "Me queda " + self.energia().toString() + " unidades de energia"
-	method incorporaEfecto(unElemento) {} // usar con los potenciadores
+	method nivelDeEnergia() = "energia:" + self.energia().toString() + " - Llaves:" + self.llavesConseguidas().toString() 
+	
+	method incorporaEfecto(unElemento) {efectoModificador = unElemento.efecto()} // usar con los potenciadores
 	method perderEnergia(){self.energia(self.energia()-1)}
-	method ganarEnergia(cantidad){self.energia(self.energia()+cantidad)}
+	method ganarEnergia(cantidad){self.energia(self.energia() + cantidad )}
+	method perderEnergia(cantidad){self.energia(self.energia() - cantidad )}
+	
+	
+	method comerPollo(unpollo){
+		const energiaPolloModificada =  efectoModificador.apply(unpollo, self.energia())
+		self.ganarEnergia(energiaPolloModificada)
+		nivelLlaves.AgregarPollo()
+	}
+	
 	method guardarLlave() { // guarda las llaves y al tener todas, indica al tablero poner la salida
 		self.llavesConseguidas(self.llavesConseguidas()+1)
 		if (self.llavesConseguidas() == 3)
@@ -69,19 +78,21 @@ class PersonajeNivelLlaves inherits Personaje {
 	}
 
 	/* MOVIMIENTOS */
-	override method hacerSiHayObjetoEn(posicion){	// Se sobreescribe el metodo para activar un elemento si lo hay en la posicion de destino
+ 	override method hacerSiHayObjetoEn(posicion){	// Se sobreescribe el metodo para activar un elemento si lo hay en la posicion de destino
 		if(nivelLlaves.hayElementoEn(posicion)) {
 			const unElemento = nivelLlaves.elementoDe(posicion)
 			unElemento.reaccionarA(self)
 		}else{
 			self.moverA(posicion)
+	
 		}
 	}
-	
+
 	override method moverA(posicion) { // se sobreescrive el metodo para que pierda energia y evalue si corresponde avanzar, ganar o perder el juego.
 		self.perderEnergia()
 		self.determinarAccionPara(posicion)
 		super(posicion)
+		nivelLlaves.celdaSorpresaPisada()
 	}
 }
 
@@ -92,10 +103,12 @@ class PersonajeNivelBloques inherits Personaje {
 			const unBloque = nivelBloques.bloquesEnTablero().find( { b => b.position() == posicion } )
 			unBloque.empujar(proximaPosicion)
 		}
+		self.moverA(posicion)
 	}
 	override method moverA(posicion){ 	// se sobreescrive el metodo para validar que no haya bloques cuando se mueve.
 		if(not nivelBloques.hayBloque(posicion)) {
 			super(posicion)
 		}
 	}
+
 }

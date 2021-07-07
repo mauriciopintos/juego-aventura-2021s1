@@ -4,7 +4,7 @@ import nivel_bloques.*
 import nivel_llaves.*
 
 class Bloque {	// Cajas
-	var property position = utilidadesParaJuego.posicionArbitraria()
+	var property position
 	const property image = "caja.png"
 	
 	// agregar comportamiento
@@ -17,25 +17,34 @@ class Bloque {	// Cajas
 		}
 	}
 }
-object deposito {
-	method contiene(unaPosicion) = unaPosicion.x().between(5,9) and unaPosicion.y().between(7,12)
+object deposito { // esta determinado por la zona de baldozas color naranja
+	method contiene(posicion) = posicion.x().between(5,9) and posicion.y().between(7,12)
 }
 
-object salida {
+object salida { // la salida se visualiza siempre en el mismo lugar del tablero
 	const property position = game.at(game.width()-1,0)
 	const property image = "salida.png"
-	method reaccionarA(unPersonaje){ }//nivelLlaves.ganar() }
+	const property sonido = "salir.mp3"
+		
+	method reaccionarA(unPersonaje){ } // no hace nada para respetar el polimorfismo
 }
 
 class Elemento{
-	var property position
-	method reaccionarA(unPersonaje)
+	var property position = game.at(0,0)
+	const property sonido = "coin.mp3"
+	
 	method dejarPasar(unPersonaje) { unPersonaje.position(self.position()) }
+	method esCeldaSorpresa(){return false}
+	method reaccionarA(unPersonaje){
+		self.dejarPasar(unPersonaje)
+	}
+	
 }
 class Llave inherits Elemento{
 	const property image = "llave.png"
+	override method sonido() = "salir.mp3"
 	override method reaccionarA(unPersonaje){
-		self.dejarPasar(unPersonaje)
+		super(unPersonaje)
 		unPersonaje.guardarLlave()
 	}
 }
@@ -43,39 +52,93 @@ class Llave inherits Elemento{
 class Pollo inherits Elemento{
 	var property energia =  0.randomUpTo(30).truncate(0)
 	const property image = "pollo.png"
+	
+	override method sonido() = "comer.mp3"
 	override method reaccionarA(unPersonaje){
-		self.dejarPasar(unPersonaje)
-		unPersonaje.ganarEnergia(self.energia())
+		super(unPersonaje)
+		unPersonaje.comerPollo(self)
 	}
 }
 
 class Modificador inherits Elemento{
-	const property image = "modificador.png"
-	const property nombre = "sin Modificador"
-	method energiaOtorgada(personaje,unPollo) = unPollo.energia()
-	override method reaccionarA(unPersonaje){if(self.position() == unPersonaje.position()) unPersonaje.incorporaEfecto(self)}
+	const property image = "coin.png"
+	method efecto() { return({unPollo,energiaActual => unPollo.energia() }) }  
+	override method reaccionarA(unPersonaje){
+		super(unPersonaje)
+		unPersonaje.incorporaEfecto(self)
+		}
 }
 
 class Duplicador inherits Modificador  {
-	override method nombre() = "Duplicador"
-	override method energiaOtorgada(personaje,unPollo) = super(personaje,unPollo) * 2
+	override method efecto() { return({unPollo,energiaActual => unPollo.energia() * 2 }) }
+	override method reaccionarA(unPersonaje){
+		super(unPersonaje)
+		game.say(self,"Duplicador")
+	}
 }
 
-class Reforzador inherits Duplicador {
-	override method nombre() = "Reforzador"
-	override method energiaOtorgada(personaje,unPollo) =  super(personaje,unPollo) + self.energiaExtra(personaje)
-	method energiaExtra(personaje) = if(personaje.energia() < 10 ) 20 else 0
+class Reforzador inherits Modificador{
+	method energiaExtra(energiaActual) = if(energiaActual < 10 ) 20 else 0
+	override method efecto() { return({unPollo,energiaActual  => unPollo.energia() * 2  + self.energiaExtra(energiaActual) }) }
+	override method reaccionarA(unPersonaje){
+		super(unPersonaje)
+		game.say(self,"reforzador")
+	}
 }
 
 class TripleOrNada inherits Modificador {
-	override method nombre() = "Triple O Nada"
-	override method energiaOtorgada(personaje,unPollo) =  super(personaje,unPollo) + self.multiplicador(personaje)
-	method multiplicador(personaje) = if(personaje.energia().even() ) 0 else 3
+	method multiplicador(energia) = if(energia.even() ) 0 else 3
+	override method efecto() { return({unPollo,energiaActual  => unPollo.energia() *  self.multiplicador(energiaActual)  }) }
+	override method reaccionarA(unPersonaje){
+		super(unPersonaje)
+		game.say(self,"triple Birra o nada")
+	}
 }
 
 class CeldaSorpresa inherits Elemento{
+	var property fueActivada = false
 	var property image = "sorpresa.png"
-	method cambiarDeIMagen(){image="kisspng.png"}
+	
+	method cambiarDeIMagen(){image="sorpresaUsada.png"}
 	override method reaccionarA(unPersonaje){ // DETERMINAR Y CODIFICAR ACCION
+	}
+	
+	override method esCeldaSorpresa(){return true}
+	
+	 method activarSorpresa(){
+	 	self.cambiarDeIMagen()
+		fueActivada = true
+	}
+}
+
+class CeldaSorpresaA inherits CeldaSorpresa {
+	
+	override method activarSorpresa(){
+		super()
+		nivelLlaves.Teletransportar()
+	}
+}
+
+class CeldaSorpresaB inherits CeldaSorpresa {
+	
+	override method activarSorpresa(){
+		super()
+		nivelLlaves.EfectoAgregarEnergia()
+	}
+}
+
+class CeldaSorpresaC inherits CeldaSorpresa {
+	
+	override method activarSorpresa(){
+		super()
+		nivelLlaves.EfectoPerderEnergia()
+	}
+}
+
+class CeldaSorpresaD inherits CeldaSorpresa {
+	
+	override method activarSorpresa(){
+		super()
+		nivelLlaves.AgregarPollo()
 	}
 }

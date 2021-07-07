@@ -28,6 +28,14 @@ object nivelLlaves {
 	method elementoDe(posicion) = elementosEnNivel.find( { e => e.position() == posicion } )
 	method hayElementoEn(posicion) = elementosEnNivel.any( { e => e.position() == posicion } )
 	method estado() { game.say(personaje,personaje.nivelDeEnergia() ) } // indica el estado de energia
+	method celdasSopresa(){   
+			return elementosEnNivel.filter( { e => e.esCeldaSorpresa() } )
+	}
+	
+	method entroEnZona(posicionPersonaje,posicionCelda) {
+		return (posicionCelda.x().between(posicionPersonaje.x() ,posicionPersonaje.x() ) and    posicionCelda.y().between(posicionPersonaje.y() -1 ,posicionPersonaje.y() +1)
+		or     posicionCelda.x().between(posicionPersonaje.x() -1 ,posicionPersonaje.x() +1) and    posicionCelda.y().between(posicionPersonaje.y()  ,posicionPersonaje.y() ))
+	}
 	
 	method configurate() {
 		// fondo - es importante que sea el primer visual que se agregue
@@ -35,8 +43,16 @@ object nivelLlaves {
 				 
 		// otros visuals, p.ej. bloques o llaves
 		self.ponerElementos(3,llave)
-		self.ponerElementos(5,pollo)
-		self.ponerElementos(4,sorpresa)  // SOLO PARA PROBAR AGREGAR LOS QUE CORRESPONDA
+		self.ponerElementos(1,pollo)
+		
+		self.ponerElementos(1,tripleOrNada)
+		self.ponerElementos(1,reforzador)
+		self.ponerElementos(1,duplicador)  
+		
+		self.ponerElementos(1,sorpresaA)
+		self.ponerElementos(2,sorpresaB)
+		self.ponerElementos(1,sorpresaC)
+		self.ponerElementos(1,sorpresaD)
 			
 		// personaje, es importante que sea el último visual que se agregue
 		game.addVisual(personaje)
@@ -50,14 +66,43 @@ object nivelLlaves {
 		keyboard.e().onPressDo{ self.estado() }
 		
 		// colisiones, acá sí hacen falta
-		game.whenCollideDo(personaje, {
-			//objeto => objeto.reaccionarA(personaje)
+		game.whenCollideDo(personaje, { 
 			objeto => game.removeVisual(objeto)
+			elementosEnNivel.remove(objeto)
+			game.sound(objeto.sonido()).play()
 			self.estado()
 		} )
 	}
+
+	method celdaSorpresaPisada(){   
+		const celdas = self.celdasSopresa().filter( {
+			e => self.entroEnZona(personaje.position() ,e.position())
+				and not e.fueActivada()
+			} )	
+		if (celdas.size() > 0 ){
+			celdas.forEach {celda =>  celda.activarSorpresa()}
+		}
+	}
+	
+	method AgregarPollo() {
+		self.ponerElementos(1,pollo)
+	}
+	
+	method EfectoPerderEnergia() {
+		personaje.perderEnergia(15)
+	}
+	
+	method EfectoAgregarEnergia() {
+		personaje.ganarEnergia(30)
+	}
+	
+	method Teletransportar() {
+		personaje.position(utilidadesParaJuego.posicionArbitraria())
+	}
 	
 	method ganar() {
+		//sonido ganar
+		game.sound("ganar.mp3").play()
 		// es muy parecido al terminar() de nivelBloques
 		// el perder() también va a ser parecido
 		
@@ -66,25 +111,27 @@ object nivelLlaves {
 		// después puedo volver a agregar el fondo, y algún visual para que no quede tan pelado
 		game.addVisual(new Fondo(image="fondoCompleto.png"))
 		// después de un ratito ...
-		game.schedule(2500, {
+		game.schedule(1000, {
 			game.clear()
 			// cambio de fondo
 			game.addVisual(new Fondo(image="ganamos.png"))
 			// después de un ratito ...
-			game.schedule(3000, {
+			game.schedule(1500, {
 				// fin del juego
 				game.stop()
 			})
 		})
 	}
-	
-		method perder() {	
+
+	method perder() {
+		//sonido perder
+		game.sound("perder.mp3").play()
 		// game.clear() limpia visuals, teclado, colisiones y acciones
 		game.clear()
 		// después puedo volver a agregar el fondo, y algún visual para que no quede tan pelado
 		game.addVisual(new Fondo(image="fondoCompleto.png"))
 		// después de un ratito ...
-		game.schedule(2500, {
+		game.schedule(1000, {
 			game.clear()
 			// cambio de fondo
 			game.addVisual(new Fondo(image="perdimos.png"))
